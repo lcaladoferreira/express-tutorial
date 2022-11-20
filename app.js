@@ -22,21 +22,44 @@ app.get('/api/products', (req, res)=>{
     res.json(newProducts)
 })
 
-//dynamic routes exemple
+//dynamic routes params exemple
 app.get('/api/products/:id', (req, res)=>{
     const { id } = req.params
+
     const singleProduct = products.find(
         (product)=>product.id === Number(id)
     )
+    if(!singleProduct){
+        return res.status(404).send("the product does not exist")
+    }
         res.json(singleProduct)
 })
 
 
+
+// query product example
+app.get('/api/v1/query', (req, res)=>{
+    const { search, limit } = req.query
+    let sortedProducts = [...products]
+    if(search){
+        sortedProducts = sortedProducts.filter((product)=>{
+            return product.name.startsWith(search)
+        })
+    }
+    if(limit){
+        sortedProducts = sortedProducts.slice(0, Number(limit))
+    }
+    res.status(200).json(sortedProducts)
+})
+
+
+
+// html error pages 
 app.all('*', (req, res)=>{
     res.status(404).send('resource not found')
 })
 
-
+//server local storage setup
 app.listen(3001, () => {
     console.log('listening on 3001')
 })
